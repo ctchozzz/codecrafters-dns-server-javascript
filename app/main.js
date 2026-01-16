@@ -92,7 +92,7 @@ udpSocket.on("listening", () => {
 function parseHeader(buf) {
   const id = buf.readUInt16BE(0);
   const tmp = buf.readUInt8(2);
-  console.log(tmp.toString());
+  console.log(tmp.toString(16));
   console.log(tmp);
   return [
     id,
