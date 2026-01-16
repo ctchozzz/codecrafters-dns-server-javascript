@@ -24,8 +24,6 @@ udpSocket.on("message", (buf, rinfo) => {
       offset += question.length; // move to next question
     }
 
-    console.log(`Questions: ${questions}`);
-
     udpSocket.send(
       Buffer.from([...header, ...questions, ...answers]),
       rinfo.port,
@@ -82,6 +80,7 @@ function extractDomainName(buf) {
       // starts with 11, label is compressed
       const pointer = buf.readUInt16BE(pos) & 0x3fff; // AND with 0011 1111 1111 1111 to get the pointer
       const pointedName = extractDomainName(buf.subarray(pointer));
+      console.log("pointedName:", pointedName);
       res.concat(Buffer.concat([buf.slice(0, pos), pointedName]));
 
       // for compressed message, label takes up 2 bytes (11 + 14 bit pointer)
