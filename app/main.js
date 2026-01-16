@@ -10,11 +10,9 @@ udpSocket.bind(2053, "127.0.0.1");
 
 udpSocket.on("message", (buf, rinfo) => {
   try {
-    console.log(buf);
     const header = parseHeader(buf);
     let questions = [];
     let answers = [];
-    console.log(buf);
 
     let offset = 12; // DNS header is 12 bytes, skip header to start with question initially
     const qdcount = buf.readUInt16BE(4);
@@ -96,6 +94,7 @@ function extractDomainName(buf, offset) {
     }
   }
 
+  console.log("Extracted domain name:", res);
   return res;
 }
 
