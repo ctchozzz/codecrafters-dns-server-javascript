@@ -83,6 +83,7 @@ function extractDomainName(buf) {
       const pointer = (buf.readUInt16BE(pos) & 0x3fff) - 12; // AND with 0011 1111 1111 1111  & -12 (header bytes) to get the pointer
       console.log("extractDomainName pointer:", pointer + 12);
       const len = buf.readUInt8(pointer);
+      console.log("extractDomainName compressed len:", len);
       const sl = buf.slice(pointer, pointer + len + 1);
       res.push(...sl);
 
