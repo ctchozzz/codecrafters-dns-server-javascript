@@ -76,24 +76,12 @@ function extractDomainName(buf) {
   let res = [];
   let pos = 0; // position of the "length of label"
   while (true) {
-    //   const len = buf.readUInt8(pos);
-    //   if (len === 0) {
-    //     res.push(0x00);
-    //     break;
-    //   }
-    //   const sl = buf.slice(pos, pos + len + 1);
-    //   res.push(...sl);
-    //   pos += len + 1; // move to next label
-    // }
-    // return res;
-
     if (isCompressed(buf.subarray(pos))) {
       // starts with 11, label is compressed
       const pointer = buf.readUInt16BE(pos) & 0x3fff; // AND with 0011 1111 1111 1111 to get the pointer
-      console.log("pointer:", pointer);
-      const pointedName = extractDomainName(buf.subarray(pointer));
-      console.log("pointedName:", pointedName);
-      res.concat(Buffer.concat([buf.slice(0, pos), pointedName]));
+      const len = buf.readUInt8(pointer);
+      const sl = buf.slice(pointer, pointer + len + 1);
+      res.push(...sl);
 
       // for compressed message, label takes up 2 bytes (11 + 14 bit pointer)
       pos += 2;
@@ -154,7 +142,5 @@ function buildQuestionAnswer(buf, offset) {
 function isCompressed(buf) {
   const byte = buf.readUInt8(0);
   const binaryStr = uint8ToBinaryString(byte);
-  console.log("isCompressed byte:", byte);
-  console.log("isCompressed binaryStr:", binaryStr);
   return binaryStr.startsWith("11");
 }
