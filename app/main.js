@@ -78,12 +78,13 @@ function extractDomainName(buf) {
   while (true) {
     const len = buf.readUInt8(pos);
     if (len === 0) {
-      res = res.concat([0x00]);
+      res.concat([0x00]);
       break;
     }
+    res = res.concat(buf.slice(pos, pos + len + 1));
     pos += len + 1; // move to next label
   }
-  return buf.subarray(0, pos);
+  return res;
 
   // if (isCompressed(buf.subarray(pos))) {
   //   // starts with 11, label is compressed
