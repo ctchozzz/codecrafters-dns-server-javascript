@@ -94,7 +94,6 @@ function extractDomainName(buf, offset) {
     }
   }
 
-  console.log("Extracted domain name:", res);
   return res;
 }
 
@@ -104,6 +103,7 @@ function uint8ToBinaryString(byte) {
 
 function buildQuestionAnswer(buf, offset) {
   const domainName = extractDomainName(buf, offset);
+  console.log("Domain Name Bytes: ", domainName);
 
   const question = [
     ...domainName,
