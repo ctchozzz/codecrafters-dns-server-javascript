@@ -91,7 +91,6 @@ udpSocket.on("listening", () => {
 });
 
 function parseHeader(buf) {
-  const id = buf.readUInt16BE(0);
   const tmp = uint8ToBinaryString(buf.readUInt8(2));
   let arr = [...tmp];
   arr[0] = "1";
@@ -103,7 +102,8 @@ function parseHeader(buf) {
     rcode = "0100"; // Not Implemented
   }
   return [
-    id,
+    buf.readUInt8(0),
+    buf.readUInt8(1),
     parseInt(arr.join(""), 2),
     parseInt(rcode.padStart(8, "0"), 2),
     0x00,
