@@ -44,7 +44,7 @@ udpSocket.on("message", (buf, rinfo) => {
       0x01, // Class IN
     ]);
 
-    udpSocket.send(header + question, rinfo.port, rinfo.address);
+    udpSocket.send(header.concat(question), rinfo.port, rinfo.address);
   } catch (e) {
     console.log(`Error receiving data: ${e}`);
   }
