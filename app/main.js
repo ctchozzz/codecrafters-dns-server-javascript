@@ -72,16 +72,29 @@ function parseHeader(buf) {
 
 function extractDomainName(buf) {
   // label: <length + char> + null bytes
+
+  let res = [];
   let pos = 0; // position of the "length of label"
   while (true) {
-    const len = buf.readUInt8(pos);
-    if (len === 0) {
-      break;
+    if (isCompressed(buf.subarray(pos))) {
+      // starts with 11, label is compressed
+      const pointer = buf.readUInt16BE(pos) & 0x3fff; // AND with 0011 1111 1111 1111 to get the pointer
+      const pointedName = extractDomainName(buf.subarray(pointer));
+      res.concat(Buffer.concat([buf.slice(0, pos), pointedName]));
+
+      // for compressed message, label takes up 2 bytes (11 + 14 bit pointer)
+      pos += 2;
+    } else {
+      const len = buf.readUInt8(pos);
+      if (len === 0) {
+        break;
+      }
+      res = res.concat(buf.slice(pos, pos + len + 1));
+      pos += len + 1;
     }
-    pos += len + 1;
   }
 
-  return buf.slice(0, pos + 1);
+  return res;
 }
 
 function uint8ToBinaryString(byte) {
@@ -89,19 +102,7 @@ function uint8ToBinaryString(byte) {
 }
 
 function buildQuestionAnswer(buf, offset) {
-  console.log(`offset value: ${offset}`);
-  const tmp = buf.subarray(offset);
-  let domainName;
-  if (!isCompressed(tmp)) {
-    domainName = extractDomainName(tmp);
-  } else {
-    // compressed format, get domain name from the pointer
-
-    // get first 2 bytes then set first 2 bit to 0 => (AND 0011 1111 1111 1111)
-    const newOffset = tmp.readUInt16BE() & 0x3fff;
-    console.log(`compressed pointer to ${newOffset}`);
-    domainName = extractDomainName(tmp.subarrays(newOffset));
-  }
+  const domainName = extractDomainName(buf.subarray(offset));
 
   const question = [
     ...domainName,
@@ -136,7 +137,6 @@ function buildQuestionAnswer(buf, offset) {
 
 function isCompressed(buf) {
   const byte = buf.readUInt8(0);
-  console.log(byte);
   const binaryStr = uint8ToBinaryString(byte);
   return binaryStr.startsWith("11");
 }
