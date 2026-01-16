@@ -80,7 +80,7 @@ function extractDomainName(buf, offset) {
   while (true) {
     if (isCompressed(tmp.subarray(pos))) {
       // starts with 11, label is compressed
-      const pointer = tmp.readUInt16BE(pos) & 0x3fff; // AND with 0011 1111 1111 1111  & -12 (header bytes) to get the pointer
+      const pointer = tmp.readUInt16BE(pos) & 0x3fff; // AND with 0011 1111 1111 1111 (header bytes) to get the pointer
       const len = buf.readUInt8(pointer);
       console.log("extractDomainName compressed len:", len);
       const sl = buf.slice(pointer, pointer + len + 1);
