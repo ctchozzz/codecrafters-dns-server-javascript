@@ -89,6 +89,7 @@ function extractDomainName(buf, offset) {
     } else {
       const len = tmp.readUInt8(pos);
       if (len === 0) {
+        res.push(0x00);
         break;
       }
       const sl = tmp.slice(pos, pos + len + 1);
