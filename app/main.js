@@ -1,4 +1,5 @@
 const dgram = require("dgram");
+const dns = require("dns");
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
@@ -22,10 +23,6 @@ udpSocket.on("message", (buf, rinfo) => {
       answers.push(...answer);
       offset += question.length; // move to next question
     }
-
-    console.log("length of header:", header.length);
-    console.log("length of questions:", questions.length);
-    console.log("length of answers:", answers.length);
 
     udpSocket.send(
       Buffer.from([...header, ...questions, ...answers]),
@@ -58,8 +55,6 @@ function parseHeader(buf) {
     rcode = "0100"; // Not Implemented
   }
   const qdcount = buf.readUInt16BE(4);
-  const ancount = buf.readUInt16BE(6);
-  console.log(ancount);
   return [
     buf.readUInt8(0),
     buf.readUInt8(1),
@@ -67,8 +62,8 @@ function parseHeader(buf) {
     parseInt(rcode.padStart(8, "0"), 2),
     qdcount >> 8, // first 8bits
     qdcount & 0xff, // last 8bits
-    ancount >> 8,
-    ancount & 0xff,
+    qdcount >> 8, // first 8bits
+    qdcount & 0xff, // last 8bits
     0x00,
     0x00,
     0x00,
@@ -85,7 +80,7 @@ function extractDomainName(buf, offset) {
   while (true) {
     if (isCompressed(tmp.subarray(pos))) {
       // starts with 11, label is compressed
-      const pointer = tmp.readUInt16BE(pos) & 0x3fff; // AND with 0011 1111 1111 1111 (header bytes) to get the pointer
+      const pointer = tmp.readUInt16BE(pos) & 0x3fff; // AND with 0011 1111 1111 1111 to get the pointer
       const compressed = extractDomainName(buf, pointer); // no uncompressed parts after compressed part
       res.push(...compressed);
       break;
@@ -119,6 +114,15 @@ function buildQuestionAnswer(buf, offset) {
     0x01, // Class IN
   ];
 
+  // const addresses = await new Promise((resolve, reject) => {
+  //   dns.resolve(labelToString(domainName), "A", (err, addresses) => {
+  //     if (err) reject(err);
+  //     else resolve(addresses);
+  //   });
+  // });
+
+  // console.log(addresses);
+
   const answer = [
     ...domainName,
     0x00,
@@ -131,7 +135,7 @@ function buildQuestionAnswer(buf, offset) {
     0x3c, // TTL 60 seconds
     0x00,
     0x04, // Data length 4 bytes
-    0x7f, // 127
+    0x6c, // 127
     0x00, // 0
     0x0, // 0
     0x01, // 1
@@ -145,4 +149,19 @@ function buildQuestionAnswer(buf, offset) {
 function isCompressed(buf) {
   const byte = buf.readUInt8(0);
   return byte >> 6 === 3;
+}
+
+function labelToString(buf) {
+  let pos = 0;
+  let labels = [];
+
+  while (true) {
+    const len = buf[pos];
+    if (len === 0) break; // end of name
+    const label = String.fromCharCode(...buf.slice(pos + 1, pos + 1 + len));
+    labels.push(label);
+    pos += len + 1; // move to next label
+  }
+
+  return labels.join(".");
 }
