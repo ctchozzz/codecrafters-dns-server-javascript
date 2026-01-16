@@ -1,5 +1,6 @@
 const dgram = require("dgram");
 const dns = require("dns");
+const { parse } = require("path");
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
@@ -121,8 +122,7 @@ async function buildQuestionAnswer(buf, offset) {
     });
   });
 
-  console.log(addresses);
-
+  const addr = addresses[0].split(".");
   const answer = [
     ...domainName,
     0x00,
@@ -135,10 +135,10 @@ async function buildQuestionAnswer(buf, offset) {
     0x3c, // TTL 60 seconds
     0x00,
     0x04, // Data length 4 bytes
-    0x6c, // 127
-    0x00, // 0
-    0x0, // 0
-    0x01, // 1
+    parseInt(addr[0], 2),
+    parseInt(addr[1], 2),
+    parseInt(addr[2], 2),
+    parseInt(addr[3], 2),
   ];
   return {
     question: question,
