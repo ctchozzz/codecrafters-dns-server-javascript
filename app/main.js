@@ -89,7 +89,6 @@ function extractDomainName(buf, offset) {
     } else {
       const len = tmp.readUInt8(pos);
       if (len === 0) {
-        res.push(0x00);
         break;
       }
       const sl = tmp.slice(pos, pos + len + 1);
@@ -141,6 +140,5 @@ function buildQuestionAnswer(buf, offset) {
 
 function isCompressed(buf) {
   const byte = buf.readUInt8(0);
-  const binaryStr = uint8ToBinaryString(byte);
-  return binaryStr.startsWith("11");
+  return byte >> 6 === 3;
 }
