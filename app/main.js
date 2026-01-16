@@ -11,39 +11,19 @@ udpSocket.bind(2053, "127.0.0.1");
 udpSocket.on("message", (buf, rinfo) => {
   try {
     const header = parseHeader(buf);
-    const qdcount = buf.readUInt16BE(2);
-    console.log(`Received ${qdcount} questions`);
-    console.log(buf);
-    const domainName = extractDomainName(buf.subarray(12));
+    let questions = [];
+    let answers = [];
 
-    const question = [
-      ...domainName,
-      0x00,
-      0x01, // Type A
-      0x00,
-      0x01, // Class IN
-    ];
-
-    const answer = [
-      ...domainName,
-      0x00,
-      0x01, // Type A
-      0x00,
-      0x01, // Class IN
-      0x00,
-      0x00,
-      0x00,
-      0x3c, // TTL 60 seconds
-      0x00,
-      0x04, // Data length 4 bytes
-      0x7f, // 127
-      0x00, // 0
-      0x0, // 0
-      0x01, // 1
-    ];
+    let offset = 12; // DNS header is 12 bytes
+    for (let i = 0; i < 2; i++) {
+      const { question, answer } = buildQuestionAnswer(buf, offset);
+      questions = questions.concat(question);
+      answers = answers.concat(answer);
+      offset += question.length + 1; // move to next question
+    }
 
     udpSocket.send(
-      Buffer.from([...header, ...question, ...answer]),
+      Buffer.from([...header, ...questions, ...answers]),
       rinfo.port,
       rinfo.address
     );
@@ -104,4 +84,38 @@ function extractDomainName(buf) {
 
 function uint8ToBinaryString(byte) {
   return byte.toString(2).padStart(8, "0");
+}
+
+function buildQuestionAnswer(buf, offset) {
+  const domainName = extractDomainName(buf.subarray(offset));
+
+  const question = [
+    ...domainName,
+    0x00,
+    0x01, // Type A
+    0x00,
+    0x01, // Class IN
+  ];
+
+  const answer = [
+    ...domainName,
+    0x00,
+    0x01, // Type A
+    0x00,
+    0x01, // Class IN
+    0x00,
+    0x00,
+    0x00,
+    0x3c, // TTL 60 seconds
+    0x00,
+    0x04, // Data length 4 bytes
+    0x7f, // 127
+    0x00, // 0
+    0x0, // 0
+    0x01, // 1
+  ];
+  return {
+    question: question,
+    answer: answer,
+  };
 }
