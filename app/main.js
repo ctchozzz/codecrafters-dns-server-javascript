@@ -104,8 +104,8 @@ function parseHeader(buf) {
   }
   return [
     id,
-    bitStringToHexByte(arr.join("")),
-    bitStringToHexByte(rcode.padStart(4, "0")),
+    parseInt(arr.join(""), 2),
+    parseInt(rcode.padStart(4, "0"), 2),
     0x00,
     0x01,
     0x00,
