@@ -105,7 +105,7 @@ function parseHeader(buf) {
   return [
     id,
     parseInt(arr.join(""), 2),
-    parseInt(rcode.padStart(4, "0"), 2),
+    parseInt(rcode.padStart(8, "0"), 2),
     0x00,
     0x01,
     0x00,
