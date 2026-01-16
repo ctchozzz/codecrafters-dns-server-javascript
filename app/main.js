@@ -23,6 +23,10 @@ udpSocket.on("message", (buf, rinfo) => {
       offset += question.length; // move to next question
     }
 
+    console.log("length of header:", header.length);
+    console.log("length of questions:", questions.length);
+    console.log("length of answers:", answers.length);
+
     udpSocket.send(
       Buffer.from([...header, ...questions, ...answers]),
       rinfo.port,
