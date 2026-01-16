@@ -74,6 +74,7 @@ function extractDomainName(buf) {
   let pos = 0; // position of the "length of label"
   while (true) {
     const len = buf.readUInt8(pos);
+    console.log(len);
     if (len === 0) {
       break;
     }
