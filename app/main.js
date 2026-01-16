@@ -21,7 +21,7 @@ udpSocket.on("message", (buf, rinfo) => {
       const { question, answer } = buildQuestionAnswer(buf, offset);
       questions = questions.concat(question);
       answers = answers.concat(answer);
-      offset += question.length + 1; // move to next question
+      offset += question.length; // move to next question
     }
 
     udpSocket.send(
@@ -136,6 +136,7 @@ function buildQuestionAnswer(buf, offset) {
 
 function isCompressed(buf) {
   const byte = buf.readUInt8(0);
+  console.log(byte);
   const binaryStr = uint8ToBinaryString(byte);
   return binaryStr.startsWith("11");
 }
