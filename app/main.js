@@ -70,34 +70,70 @@ function parseHeader(buf) {
   ];
 }
 
-function extractDomainName(buf) {
-  // label: <length + char> + null bytes
+// function extractDomainName(buf) {
+//   // label: <length + char> + null bytes
 
+//   let res = [];
+//   let pos = 0; // position of the "length of label"
+//   while (true) {
+//     if (isCompressed(buf.subarray(pos))) {
+//       // starts with 11, label is compressed
+//       const pointer = (buf.readUInt16BE(pos) & 0x3fff) - 12; // AND with 0011 1111 1111 1111  & -12 (header bytes) to get the pointer
+//       const len = buf.readUInt8(pointer);
+//       const sl = buf.slice(pointer, pointer + len + 1);
+//       res.push(...sl);
+
+//       // for compressed message, label takes up 2 bytes (11 + 14 bit pointer)
+//       pos += 2;
+//     } else {
+//       const len = buf.readUInt8(pos);
+//       if (len === 0) {
+//         res.push(0x00);
+//         break;
+//       }
+//       const sl = buf.slice(pos, pos + len + 1);
+//       res.push(...sl);
+//       pos += len + 1; // move to next label
+//     }
+//   }
+
+//   console.log("extractDomainName res:", res);
+
+//   return res;
+// }
+
+function extractDomainName(buf, offset = 0, visited = new Set()) {
   let res = [];
-  let pos = 0; // position of the "length of label"
+  let pos = offset;
+
   while (true) {
-    if (isCompressed(buf.subarray(pos))) {
-      // starts with 11, label is compressed
-      const pointer = (buf.readUInt16BE(pos) & 0x3fff) - 12; // AND with 0011 1111 1111 1111  & -12 (header bytes) to get the pointer
-      const len = buf.readUInt8(pointer);
-      const sl = buf.slice(pointer, pointer + len + 1);
-      res.push(...sl);
+    const len = buf.readUInt8(pos);
 
-      // for compressed message, label takes up 2 bytes (11 + 14 bit pointer)
-      pos += 2;
-    } else {
-      const len = buf.readUInt8(pos);
-      if (len === 0) {
-        res.push(0x00);
-        break;
-      }
-      const sl = buf.slice(pos, pos + len + 1);
-      res.push(...sl);
-      pos += len + 1; // move to next label
+    // End of name
+    if (len === 0) {
+      res.push(0x00);
+      pos += 1;
+      break;
     }
-  }
 
-  console.log("extractDomainName res:", res);
+    // Compressed label (pointer)
+    if ((len & 0xc0) === 0xc0) {
+      if (visited.has(pos)) throw new Error("Pointer loop detected");
+      visited.add(pos);
+
+      const pointer = (buf.readUInt16BE(pos) & 0x3fff) - 12; // subtract header
+      const pointedName = extractDomainName(buf, pointer, visited);
+      res.push(...pointedName);
+
+      pos += 2; // pointer uses 2 bytes
+      break; // pointer terminates the name
+    }
+
+    // Normal label
+    const sl = buf.slice(pos, pos + len + 1);
+    res.push(...sl);
+    pos += len + 1;
+  }
 
   return res;
 }
