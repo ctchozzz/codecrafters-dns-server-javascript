@@ -81,7 +81,7 @@ function extractDomainName(buf) {
     pos += len + 1;
   }
 
-  return buf.slice(0, pos + 1);
+  return buf.slice(0, pos);
 }
 
 function uint8ToBinaryString(byte) {
