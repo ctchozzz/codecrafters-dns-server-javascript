@@ -28,10 +28,9 @@ udpSocket.on("message", (buf, rinfo) => {
       0x65, // e
       0x72, // r
       0x73, // s
-      0x03, // 3 length
-      0x63, // c
+      0x02, // 3 length
+      0x69, // i
       0x6f, // o
-      0x6d, // m
       0x00, // null terminator of FQDN
       0x00,
       0x01, // Type A
