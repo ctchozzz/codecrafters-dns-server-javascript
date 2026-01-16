@@ -81,35 +81,32 @@ function extractDomainName(buf) {
       res = res.concat([0x00]);
       break;
     }
-    res = res.concat(buf.slice(pos, pos + len + 1));
-    pos += len + 1; // move to next label 
+    pos += len + 1; // move to next label
   }
-  return res;
+  return buf.subarray(0, pos);
 
+  // if (isCompressed(buf.subarray(pos))) {
+  //   // starts with 11, label is compressed
+  //   const pointer = buf.readUInt16BE(pos) & 0x3fff; // AND with 0011 1111 1111 1111 to get the pointer
+  //   console.log("pointer:", pointer);
+  //   const pointedName = extractDomainName(buf.subarray(pointer));
+  //   console.log("pointedName:", pointedName);
+  //   res.concat(Buffer.concat([buf.slice(0, pos), pointedName]));
 
-
-    // if (isCompressed(buf.subarray(pos))) {
-    //   // starts with 11, label is compressed
-    //   const pointer = buf.readUInt16BE(pos) & 0x3fff; // AND with 0011 1111 1111 1111 to get the pointer
-    //   console.log("pointer:", pointer);
-    //   const pointedName = extractDomainName(buf.subarray(pointer));
-    //   console.log("pointedName:", pointedName);
-    //   res.concat(Buffer.concat([buf.slice(0, pos), pointedName]));
-
-    //   // for compressed message, label takes up 2 bytes (11 + 14 bit pointer)
-    //   pos += 2;
-    // } else {
-    //   const len = buf.readUInt8(pos);
-    //   if (len === 0) {
-    //     break;
-    //   }
-    //   res = res.concat(buf.slice(pos, pos + len + 1));
-    //   pos += len + 1;
-    // }
-  }
-
-  return res;
+  //   // for compressed message, label takes up 2 bytes (11 + 14 bit pointer)
+  //   pos += 2;
+  // } else {
+  //   const len = buf.readUInt8(pos);
+  //   if (len === 0) {
+  //     break;
+  //   }
+  //   res = res.concat(buf.slice(pos, pos + len + 1));
+  //   pos += len + 1;
+  // }
 }
+
+//   return res;
+// }
 
 function uint8ToBinaryString(byte) {
   return byte.toString(2).padStart(8, "0");
