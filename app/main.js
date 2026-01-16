@@ -13,13 +13,14 @@ udpSocket.on("message", (buf, rinfo) => {
     const header = parseHeader(buf);
     let questions = [];
     let answers = [];
+    console.log(buf);
 
     let offset = 12; // DNS header is 12 bytes
     for (let i = 0; i < 2; i++) {
       const { question, answer } = buildQuestionAnswer(buf, offset);
       questions = questions.concat(question);
       answers = answers.concat(answer);
-      offset += question.length; // move to next question
+      offset += question.length + 1; // move to next question
     }
 
     udpSocket.send(
