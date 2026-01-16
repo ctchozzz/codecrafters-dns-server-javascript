@@ -57,15 +57,17 @@ function parseHeader(buf) {
   if (opcode !== 0) {
     rcode = "0100"; // Not Implemented
   }
+  const qdcount = buf.readUInt16BE(4);
+  const ancount = buf.readUInt16BE(6);
   return [
     buf.readUInt8(0),
     buf.readUInt8(1),
     parseInt(arr.join(""), 2),
     parseInt(rcode.padStart(8, "0"), 2),
-    0x00,
-    0x01,
-    0x00,
-    0x01,
+    qdcount >> 8, // first 8bits
+    qdcount & 0xff, // last 8bits
+    ancount >> 8,
+    ancount & 0xff,
     0x00,
     0x00,
     0x00,
