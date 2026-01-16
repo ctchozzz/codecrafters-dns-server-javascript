@@ -15,8 +15,9 @@ udpSocket.on("message", (buf, rinfo) => {
     let answers = [];
     console.log(buf);
 
-    let offset = 12; // DNS header is 12 bytes
+    let offset = 12; // DNS header is 12 bytes, skip header to start with question initially
     const qdcount = buf.readUInt16BE(4);
+    console.log(`Questions count: ${qdcount}`);
     for (let i = 0; i < qdcount; i++) {
       const { question, answer } = buildQuestionAnswer(buf, offset);
       questions = questions.concat(question);
