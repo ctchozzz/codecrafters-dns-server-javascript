@@ -1,6 +1,15 @@
 const dgram = require("dgram");
 const dns = require("dns");
-const { parse } = require("path");
+
+let resolver;
+for (let i = 0; i < process.argv.length; i++) {
+  if (process.argv[i] === "--resolver") {
+    resolver = process.argv[i + 1];
+    i++;
+  }
+}
+
+console.log(resolver);
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
