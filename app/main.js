@@ -73,6 +73,7 @@ function parseHeader(buf) {
 
 function extractDomainName(buf) {
   // label: <length + char> + null bytes
+  console.log("extractDomainName buf:", buf);
 
   let res = [];
   let pos = 0; // position of the "length of label"
