@@ -18,8 +18,8 @@ udpSocket.on("message", (buf, rinfo) => {
     const qdcount = buf.readUInt16BE(4);
     for (let i = 0; i < qdcount; i++) {
       const { question, answer } = buildQuestionAnswer(buf, offset);
-      questions = questions.concat(question);
-      answers = answers.concat(answer);
+      questions.push(...question);
+      answers.push(...answer);
       offset += question.length; // move to next question
     }
 
@@ -103,7 +103,6 @@ function uint8ToBinaryString(byte) {
 
 function buildQuestionAnswer(buf, offset) {
   const domainName = extractDomainName(buf, offset);
-  console.log("Domain Name Bytes: ", domainName);
 
   const question = [
     ...domainName,
