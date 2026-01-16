@@ -91,13 +91,20 @@ udpSocket.on("listening", () => {
 
 function parseHeader(buf) {
   const id = buf.readUInt16BE(0);
-  const tmp = buf.readUInt8(2).toString(2).padStart(8, "0");
-  console.log(tmp);
+  const tmp = uint8ToBinaryString(buf.readUInt8(2));
+  let arr = [...tmp];
+  arr[0] = "1";
+  arr[5] = "0";
+  arr[6] = "0";
+  const opcode = parseInt(arr.slice(1, 5).join(""), 2);
+  let rcode = "0000";
+  if (opcode !== 0) {
+    rcode = "0100"; // Not Implemented
+  }
   return [
     id,
-    // 1 <mimic> 0 0  <mimic>
-    0x80,
-    0x00,
+    bitStringToHexByte(arr.join("")),
+    bitStringToHexByte(rcode.padStart(4, "0")),
     0x00,
     0x01,
     0x00,
@@ -107,4 +114,19 @@ function parseHeader(buf) {
     0x00,
     0x00,
   ];
+}
+
+function uint8ToBinaryString(byte) {
+  return byte.toString(2).padStart(8, "0");
+}
+
+function bitStringToHexByte(bitString) {
+  // 1. Parse binary string to a number (radix 2)
+  const decimalValue = parseInt(bitString, 2); // e.g., "10110010" -> 178
+
+  // 2. Convert number to hex string (radix 16) and pad to 2 digits
+  const hexByte = decimalValue.toString(16).padStart(2, "0"); // 178 -> "b2"
+
+  // 3. Add the 0x prefix
+  return "0x" + hexByte; // "0xb2"
 }
