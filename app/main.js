@@ -104,6 +104,7 @@ function uint8ToBinaryString(byte) {
 }
 
 function buildQuestionAnswer(buf, offset) {
+  console.log("buildQuestionAnswer offset:", offset);
   const domainName = extractDomainName(buf.subarray(offset));
 
   const question = [
