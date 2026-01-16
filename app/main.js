@@ -11,26 +11,10 @@ udpSocket.bind(2053, "127.0.0.1");
 udpSocket.on("message", (buf, rinfo) => {
   try {
     const header = parseHeader(buf);
-    console.log(header);
+    const domainName = extractDomainName(buf.subarray(12));
 
     const question = [
-      0x0c, // 12 bytes length
-      0x63, // c
-      0x6f, // o
-      0x64, // d
-      0x65, // e
-      0x63, // c
-      0x72, // r
-      0x61, // a
-      0x66, // f
-      0x74, // t
-      0x65, // e
-      0x72, // r
-      0x73, // s
-      0x02, // 2 length
-      0x69, // i
-      0x6f, // o
-      0x00, // null terminator of FQDN
+      ...domainName,
       0x00,
       0x01, // Type A
       0x00,
@@ -38,23 +22,7 @@ udpSocket.on("message", (buf, rinfo) => {
     ];
 
     const answer = [
-      0x0c, // 12 bytes length
-      0x63, // c
-      0x6f, // o
-      0x64, // d
-      0x65, // e
-      0x63, // c
-      0x72, // r
-      0x61, // a
-      0x66, // f
-      0x74, // t
-      0x65, // e
-      0x72, // r
-      0x73, // s
-      0x02, // 2 length
-      0x69, // i
-      0x6f, // o
-      0x00, // null terminator of FQDN
+      ...domainName,
       0x00,
       0x01, // Type A
       0x00,
@@ -117,17 +85,20 @@ function parseHeader(buf) {
   ];
 }
 
-function uint8ToBinaryString(byte) {
-  return byte.toString(2).padStart(8, "0");
+function extractDomainName(buf) {
+  // label: <length + char> + null bytes
+  let pos = 0; // position of the "length of label"
+  while (true) {
+    const len = buf.readUInt8(pos);
+    if (len === 0) {
+      break;
+    }
+    pos += len + 1;
+  }
+
+  return buf.slice(0, pos + 1);
 }
 
-function bitStringToHexByte(bitString) {
-  // 1. Parse binary string to a number (radix 2)
-  const decimalValue = parseInt(bitString, 2); // e.g., "10110010" -> 178
-
-  // 2. Convert number to hex string (radix 16) and pad to 2 digits
-  const hexByte = decimalValue.toString(16).padStart(2, "0"); // 178 -> "b2"
-
-  // 3. Add the 0x prefix
-  return "0x" + hexByte; // "0xb2"
+function uint8ToBinaryString(byte) {
+  return byte.toString(2).padStart(8, "0");
 }
