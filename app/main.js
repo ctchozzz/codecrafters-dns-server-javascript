@@ -15,11 +15,36 @@ udpSocket.on("message", (buf, rinfo) => {
     );
     console.log(buf);
 
-    const response = Buffer.from([
-      0x04, 0xd2, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    const header = Buffer.from([
+      0x04, 0xd2, 0x80, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     ]);
 
-    udpSocket.send(response, rinfo.port, rinfo.address);
+    const question = Buffer.from([
+      0x0c, // 12 bytes length
+      0x63, // c
+      0x6f, // o
+      0x64, // d
+      0x65, // e
+      0x63, // c
+      0x72, // r
+      0x61, // a
+      0x66, // f
+      0x74, // t
+      0x65, // e
+      0x72, // r
+      0x73, // s
+      0x03, // 3 length
+      0x63, // c
+      0x6f, // o
+      0x6d, // m
+      0x00, // null terminator of FQDN
+      0x00,
+      0x01, // Type A
+      0x00,
+      0x01, // Class IN
+    ]);
+
+    udpSocket.send(header + question, rinfo.port, rinfo.address);
   } catch (e) {
     console.log(`Error receiving data: ${e}`);
   }
