@@ -103,7 +103,7 @@ function uint8ToBinaryString(byte) {
   return byte.toString(2).padStart(8, "0");
 }
 
-function buildQuestionAnswer(buf, offset) {
+async function buildQuestionAnswer(buf, offset) {
   const domainName = extractDomainName(buf, offset);
 
   const question = [
@@ -114,14 +114,14 @@ function buildQuestionAnswer(buf, offset) {
     0x01, // Class IN
   ];
 
-  // const addresses = await new Promise((resolve, reject) => {
-  //   dns.resolve(labelToString(domainName), "A", (err, addresses) => {
-  //     if (err) reject(err);
-  //     else resolve(addresses);
-  //   });
-  // });
+  const addresses = await new Promise((resolve, reject) => {
+    dns.resolve(labelToString(domainName), "A", (err, addresses) => {
+      if (err) reject(err);
+      else resolve(addresses);
+    });
+  });
 
-  // console.log(addresses);
+  console.log(addresses);
 
   const answer = [
     ...domainName,
