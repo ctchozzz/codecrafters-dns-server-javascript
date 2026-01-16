@@ -140,5 +140,7 @@ function buildQuestionAnswer(buf, offset) {
 function isCompressed(buf) {
   const byte = buf.readUInt8(0);
   const binaryStr = uint8ToBinaryString(byte);
+  console.log("isCompressed byte:", byte);
+  console.log("isCompressed binaryStr:", binaryStr);
   return binaryStr.startsWith("11");
 }
