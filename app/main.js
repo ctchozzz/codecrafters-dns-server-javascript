@@ -17,7 +17,6 @@ udpSocket.on("message", (buf, rinfo) => {
 
     let offset = 12; // DNS header is 12 bytes, skip header to start with question initially
     const qdcount = buf.readUInt16BE(4);
-    console.log(`Questions count: ${qdcount}`);
     for (let i = 0; i < qdcount; i++) {
       const { question, answer } = buildQuestionAnswer(buf, offset);
       questions = questions.concat(question);
@@ -91,7 +90,18 @@ function uint8ToBinaryString(byte) {
 }
 
 function buildQuestionAnswer(buf, offset) {
-  const domainName = extractDomainName(buf.subarray(offset));
+  const tmp = buf.subarray(offset);
+  let domainName;
+  if (!isCompressed(tmp)) {
+    domainName = extractDomainName(tmp);
+  } else {
+    // compressed format, get domain name from the pointer
+
+    // get first 2 bytes then set first 2 bit to 0 => (AND 0011 1111 1111 1111)
+    const newOffset = tmp.readUInt16BE() & 0x3fff;
+    console.log(`compressed pointer to ${newOffset}`);
+    domainName = extractDomainName(tmp.subarrays(newOffset));
+  }
 
   const question = [
     ...domainName,
@@ -122,4 +132,10 @@ function buildQuestionAnswer(buf, offset) {
     question: question,
     answer: answer,
   };
+}
+
+function isCompressed(buf) {
+  const byte = buf.readUInt8(0);
+  const binaryStr = uint8ToBinaryString(byte);
+  return binaryStr.startsWith("11");
 }
