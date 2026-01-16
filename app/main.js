@@ -92,7 +92,7 @@ function extractDomainName(buf, offset) {
       res.push(...sl);
 
       // for compressed message, label takes up 2 bytes (11 + 14 bit pointer)
-      pos += 2;
+      pos += 3;
       console.log("extractDomainName compressed pos after:", pos);
     } else {
       const len = tmp.readUInt8(pos);
