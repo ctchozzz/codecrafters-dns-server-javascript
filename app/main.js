@@ -90,6 +90,7 @@ function uint8ToBinaryString(byte) {
 }
 
 function buildQuestionAnswer(buf, offset) {
+  console.log(`offset value: ${offset}`);
   const tmp = buf.subarray(offset);
   let domainName;
   if (!isCompressed(tmp)) {
