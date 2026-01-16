@@ -20,7 +20,7 @@ udpSocket.on("message", (buf, rinfo) => {
       const { question, answer } = buildQuestionAnswer(buf, offset);
       questions = questions.concat(question);
       answers = answers.concat(answer);
-      offset += question.length + 1; // move to next question
+      offset += question.length; // move to next question
     }
 
     udpSocket.send(
@@ -81,7 +81,7 @@ function extractDomainName(buf) {
     pos += len + 1;
   }
 
-  return buf.slice(0, pos);
+  return buf.slice(0, pos + 1);
 }
 
 function uint8ToBinaryString(byte) {
