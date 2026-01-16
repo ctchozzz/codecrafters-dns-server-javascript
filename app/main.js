@@ -75,12 +75,12 @@ function extractDomainName(buf, offset) {
   // label: <length + char> + null bytes
 
   let res = [];
-  let pos = offset; // position of the "length of label"
+  const tmp = buf.subarray(offset);
+  let pos = 0; // position of the "length of label"
   while (true) {
-    if (isCompressed(buf.subarray(pos))) {
+    if (isCompressed(tmp.subarray(pos))) {
       // starts with 11, label is compressed
-      const pointer = buf.readUInt16BE(pos) & 0x3fff; // AND with 0011 1111 1111 1111  & -12 (header bytes) to get the pointer
-      console.log("extractDomainName pointer:", pointer + 12);
+      const pointer = tmp.readUInt16BE(pos) & 0x3fff; // AND with 0011 1111 1111 1111  & -12 (header bytes) to get the pointer
       const len = buf.readUInt8(pointer);
       console.log("extractDomainName compressed len:", len);
       const sl = buf.slice(pointer, pointer + len + 1);
@@ -89,12 +89,12 @@ function extractDomainName(buf, offset) {
       // for compressed message, label takes up 2 bytes (11 + 14 bit pointer)
       pos += 2;
     } else {
-      const len = buf.readUInt8(pos);
+      const len = tmp.readUInt8(pos);
       if (len === 0) {
         res.push(0x00);
         break;
       }
-      const sl = buf.slice(pos, pos + len + 1);
+      const sl = tmp.slice(pos, pos + len + 1);
       res.push(...sl);
       pos += len + 1; // move to next label
     }
