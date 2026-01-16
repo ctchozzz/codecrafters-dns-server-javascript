@@ -11,6 +11,8 @@ udpSocket.bind(2053, "127.0.0.1");
 udpSocket.on("message", (buf, rinfo) => {
   try {
     const header = parseHeader(buf);
+    const qdcount = parseInt(buf.readUInt16BE(2), 2);
+    console.log(`Received ${qdcount} questions`);
     const domainName = extractDomainName(buf.subarray(12));
 
     const question = [
