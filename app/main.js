@@ -10,16 +10,11 @@ udpSocket.bind(2053, "127.0.0.1");
 
 udpSocket.on("message", (buf, rinfo) => {
   try {
-    console.log(
-      `Received ${buf.length} bytes from ${rinfo.address}:${rinfo.port}`
-    );
-    console.log(buf);
-
-    const header = Buffer.from([
+    const header = [
       0x04, 0xd2, 0x80, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    ]);
+    ];
 
-    const question = Buffer.from([
+    const question = [
       0x0c, // 12 bytes length
       0x63, // c
       0x6f, // o
@@ -42,9 +37,13 @@ udpSocket.on("message", (buf, rinfo) => {
       0x01, // Type A
       0x00,
       0x01, // Class IN
-    ]);
+    ];
 
-    udpSocket.send(header.concat(question), rinfo.port, rinfo.address);
+    udpSocket.send(
+      Buffer.from(header.concat(question)),
+      rinfo.port,
+      rinfo.address
+    );
   } catch (e) {
     console.log(`Error receiving data: ${e}`);
   }
