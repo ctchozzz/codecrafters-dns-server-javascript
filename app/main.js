@@ -11,6 +11,7 @@ udpSocket.bind(2053, "127.0.0.1");
 udpSocket.on("message", (buf, rinfo) => {
   try {
     const header = parseHeader(buf);
+    console.log(header);
 
     const question = [
       0x0c, // 12 bytes length
