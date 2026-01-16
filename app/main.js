@@ -9,7 +9,7 @@ console.log("Logs from your program will appear here!");
 const udpSocket = dgram.createSocket("udp4");
 udpSocket.bind(2053, "127.0.0.1");
 
-udpSocket.on("message", (buf, rinfo) => {
+udpSocket.on("message", async (buf, rinfo) => {
   try {
     const header = parseHeader(buf);
     let questions = [];
@@ -18,7 +18,7 @@ udpSocket.on("message", (buf, rinfo) => {
     let offset = 12; // DNS header is 12 bytes, skip header to start with question initially
     const qdcount = buf.readUInt16BE(4);
     for (let i = 0; i < qdcount; i++) {
-      const { question, answer } = buildQuestionAnswer(buf, offset);
+      const { question, answer } = await buildQuestionAnswer(buf, offset);
       questions.push(...question);
       answers.push(...answer);
       offset += question.length; // move to next question
