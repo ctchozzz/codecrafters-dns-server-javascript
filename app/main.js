@@ -1,6 +1,7 @@
 const dgram = require("dgram");
 const dns = require("dns");
 
+// set custom resolver dns server
 let resolver;
 for (let i = 0; i < process.argv.length; i++) {
   if (process.argv[i] === "--resolver") {
@@ -129,7 +130,6 @@ async function buildQuestionAnswer(buf, offset) {
       else resolve(addresses);
     });
   });
-  console.log(addresses);
   const addr = addresses[0].split(".");
   const answer = [
     ...domainName,
