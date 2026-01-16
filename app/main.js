@@ -96,8 +96,6 @@ function extractDomainName(buf, offset) {
     }
   }
 
-  console.log("extractDomainName res:", res);
-
   return res;
 }
 
