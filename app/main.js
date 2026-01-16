@@ -78,7 +78,7 @@ function extractDomainName(buf) {
   while (true) {
     const len = buf.readUInt8(pos);
     if (len === 0) {
-      res.concat([0x00]);
+      res = res.concat([0x00]);
       break;
     }
     res = res.concat(buf.slice(pos, pos + len + 1));
