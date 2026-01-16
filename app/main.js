@@ -135,10 +135,10 @@ async function buildQuestionAnswer(buf, offset) {
     0x3c, // TTL 60 seconds
     0x00,
     0x04, // Data length 4 bytes
-    parseInt(addr[0], 2),
-    parseInt(addr[1], 2),
-    parseInt(addr[2], 2),
-    parseInt(addr[3], 2),
+    parseInt(addr[0]),
+    parseInt(addr[1]),
+    parseInt(addr[2]),
+    parseInt(addr[3]),
   ];
   return {
     question: question,
