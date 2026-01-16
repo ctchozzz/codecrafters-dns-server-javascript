@@ -93,6 +93,7 @@ function parseHeader(buf) {
   const id = buf.readUInt16BE(0);
   const tmp = buf.readUInt8(2);
   console.log(tmp.toString());
+  console.log(tmp);
   return [
     id,
     // 1 <mimic> 0 0  <mimic>
