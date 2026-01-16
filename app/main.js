@@ -10,6 +10,11 @@ udpSocket.bind(2053, "127.0.0.1");
 
 udpSocket.on("message", (buf, rinfo) => {
   try {
+    console.log(
+      `Received ${buf.length} bytes from ${rinfo.address}:${rinfo.port}`
+    );
+    console.log(buf);
+
     const response = Buffer.from([
       0x04, 0xd2, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     ]);
