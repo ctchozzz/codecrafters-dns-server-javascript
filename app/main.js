@@ -120,8 +120,7 @@ async function buildQuestionAnswer(buf, offset) {
       if (err) reject(err);
       else resolve(addresses);
     });
-  });
-
+  console.log(addresses);
   const addr = addresses[0].split(".");
   const answer = [
     ...domainName,
