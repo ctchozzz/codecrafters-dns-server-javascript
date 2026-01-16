@@ -10,9 +10,7 @@ udpSocket.bind(2053, "127.0.0.1");
 
 udpSocket.on("message", (buf, rinfo) => {
   try {
-    const header = [
-      0x04, 0xd2, 0x80, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
-    ];
+    const header = parseHeader(buf);
 
     const question = [
       0x0c, // 12 bytes length
@@ -90,3 +88,23 @@ udpSocket.on("listening", () => {
   const address = udpSocket.address();
   console.log(`Server listening ${address.address}:${address.port}`);
 });
+
+function parseHeader(buf) {
+  const id = buf.readUInt16BE(0);
+  const tmp = buf.readUInt(2, 1);
+  console.log(tmp.toString(16));
+  return [
+    id,
+    // 1 <mimic> 0 0  <mimic>
+    0x80,
+    0x00,
+    0x00,
+    0x01,
+    0x00,
+    0x01,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+  ];
+}
