@@ -8,8 +8,7 @@ for (let i = 0; i < process.argv.length; i++) {
     i++;
   }
 }
-
-console.log(resolver);
+dns.setServers([resolver]);
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
