@@ -74,13 +74,17 @@ function parseHeader(buf) {
 function extractDomainName(buf, offset) {
   // label: <length + char> + null bytes
 
+  console.log("original buf:", buf);
+
   let res = [];
   const tmp = buf.subarray(offset);
+  console.log("extractDomainName tmp:", tmp);
   let pos = 0; // position of the "length of label"
   while (true) {
     if (isCompressed(tmp.subarray(pos))) {
       // starts with 11, label is compressed
       const pointer = tmp.readUInt16BE(pos) & 0x3fff; // AND with 0011 1111 1111 1111 (header bytes) to get the pointer
+      console.log("extractDomainName compressed pointer:", pointer);
       const len = buf.readUInt8(pointer);
       console.log("extractDomainName compressed len:", len);
       const sl = buf.slice(pointer, pointer + len + 1);
