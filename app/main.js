@@ -59,6 +59,7 @@ function parseHeader(buf) {
   }
   const qdcount = buf.readUInt16BE(4);
   const ancount = buf.readUInt16BE(6);
+  console.log(ancount);
   return [
     buf.readUInt8(0),
     buf.readUInt8(1),
